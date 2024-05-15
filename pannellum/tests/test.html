@@ -1,0 +1,117 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pannellum Tests</title>
+    <link rel="stylesheet" href="../src/css/pannellum.css"/>
+    <script type="text/javascript" src="../src/js/libpannellum.js"></script>
+    <script type="text/javascript" src="../src/js/pannellum.js"></script>
+    <style>
+        #panorama {
+            width: 100%;
+            height: 100vh;
+        }
+
+        #fullscreen-btn {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            cursor: pointer;
+            padding: 10px;
+            background-color: #333;
+            color: #fff;
+            border: none;
+            outline: none;
+        }
+    </style>
+</head>
+<body>
+
+<div id="panorama"></div>
+<button id="fullscreen-btn">Toggle Fullscreen</button>
+
+<script>
+var viewer = pannellum.viewer('panorama', {
+    "default": {
+        "author": "testauthor",
+        "firstScene": "equirectangular",
+        "autoLoad": true
+    },
+    
+    "scenes": {
+        "cube": {
+            "title": "cube title",
+            "type": "cubemap",
+            "cubeMap": [
+                "../examples/multires/1/f00.png",
+                "../examples/multires/1/r00.png",
+                "../examples/multires/1/b00.png",
+                "../examples/multires/1/l00.png",
+                "../examples/multires/1/u00.png",
+                "../examples/multires/1/d00.png"
+            ],
+            "hotSpots": [
+                {
+                    "pitch": -12,
+                    "yaw": 170,
+                    "type": "info",
+                    "text": "info test"
+                },
+                {
+                    "pitch": -10,
+                    "yaw": -50,
+                    "type": "info",
+                    "text": "link test",
+                    "URL": "https://github.com/mpetroff/pannellum"
+                },
+                {
+                    "pitch": 0,
+                    "yaw": -10,
+                    "type": "scene",
+                    "text": "scene test",
+                    "sceneId": "multires"
+                }
+            ]
+        },
+
+        "equirectangular": {
+            "title": "equirectangular title",
+            "panorama": "https://s2.loli.net/2024/03/12/3fCAyatxpELKQNr.jpg"
+        },
+
+        "multires": {
+            "title": "multires title",
+            "type": "multires",
+            "hfov": 85,
+            "multiRes": {
+                "basePath": "../examples/multires",
+                "path": "/%l/%s%x%y",
+                "fallbackPath": "/fallback/%s",
+                "extension": "png",
+                "tileResolution": 256,
+                "maxLevel": 4,
+                "cubeResolution": 2048
+            },
+            "hotSpots": [
+                {
+                    "pitch": 20,
+                    "yaw": 20,
+                    "type": "info",
+                    "text": "drag test",
+                    "draggable": true,
+                    "dragHandlerFunc": console.log
+                }
+            ]
+        }
+    }
+});
+
+// Toggle fullscreen when the button is clicked
+document.getElementById('fullscreen-btn').addEventListener('click', function() {
+    viewer.toggleFullscreen();
+});
+</script>
+
+</body>
+</html>
