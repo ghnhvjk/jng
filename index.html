@@ -1,0 +1,527 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>沉浸式湖南景点网</title>
+    <link rel="stylesheet" href="pannellum/src/css/pannellum.css"/>
+    <script type="text/javascript" src="pannellum/src/js/libpannellum.js"></script>
+    <script type="text/javascript" src="pannellum/src/js/pannellum.js"></script>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden;
+            position: relative; /* 添加这行以便在绝对定位时基于 body 定位 */
+        }
+
+        #panorama {
+            width: 100%;
+            height: 100vh;
+        }
+
+        #miniMap {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 300px;
+            height: 225px;
+            border: 2px solid #000;
+        }
+
+        #miniMapImage {
+            width: 100%;
+            height: 100%;
+        }
+
+        #backToScene1 {
+            position: absolute;
+            top: 250px; /* 距离顶部距离 */
+            left: 950px; /* 距离左侧距离 */
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+    body {
+        position: relative; /* 设置 body 为相对定位 */
+    }
+    #playButton {
+        position: absolute; /* 设置按钮为绝对定位 */
+        top: 220px; /* 距离顶部 */
+        left: 950px; /* 距离左侧 */
+    }
+
+    </style>
+</head>
+<body>
+
+<div id="panorama"></div>
+
+<div id="miniMap">
+    <img id="miniMapImage" src="https://pic.imgdb.cn/item/661f59900ea9cb14036f19d2.jpg">
+</div>
+
+<button id="backToScene1">回到大门</button>
+
+    <button id="playButton" onclick="toggleMusic()">解说</button>
+    
+    <audio id="backgroundMusic">
+        <source src="指弹吉他 - 学习雷锋好榜样 (吉他版).mp3" type="audio/mpeg">
+        您的浏览器不支持音频元素。
+    </audio>
+
+
+<script>
+    var panorama1 = {
+        "title": "正兴广场",
+        "type": "equirectangular",
+        "panorama": "https://s2.loli.net/2024/04/06/hJ9iNBYWqbOLnd4.jpg",
+        "yaw": 190, // 定义初始视角的水平角度
+        "pitch": 0, // 定义初始视角的垂直角度
+        "hotSpots": [
+            {
+                "pitch": 0,
+                "yaw": 190,
+                "type": "scene",
+                "text": "前进",
+                "sceneId": "scene2"
+            }
+        ]
+    };
+
+    var panorama2 = {
+        "title": "游步道一",
+        "type": "equirectangular",
+        "panorama": "https://pic.imgdb.cn/item/6611000a68eb935713c786f8.jpg",
+        "hotSpots": [
+            {
+                "pitch": 2,
+                "yaw": 180,
+                "type": "scene",
+                "text": "正兴广场",
+                "sceneId": "scene1"
+            },
+            {
+                "pitch": -5,
+                "yaw": 0,
+                "type": "scene",
+                "text": "游步道二",
+                "sceneId": "scene3"
+            },
+        ]
+    };
+
+var panorama3 = {
+        "title": "游步道二",
+        "type": "equirectangular",
+        "panorama": "https://pic.imgdb.cn/item/6611000a68eb935713c7879a.jpg",
+        "hotSpots": [
+            {
+                "pitch": 0,
+                "yaw": 180,
+                "type": "scene",
+                "text": "游步道一",
+                "sceneId": "scene2"
+            },
+            {
+                "pitch": -5,
+                "yaw": -90,
+                "type": "scene",
+                "text": "中央广场",
+                "sceneId": "scene4"
+            },
+        ]
+    };
+
+
+    var panorama4 = {
+        "title": "中央广场",
+        "type": "equirectangular",
+        "panorama": "https://pic.imgdb.cn/item/6611000b68eb935713c78854.jpg",
+        "yaw": -90, // 定义初始视角的水平角度
+        "pitch": 0, // 定义初始视角的垂直角度
+        "hotSpots": [
+            {
+                "pitch": 0,
+                "yaw": 90,
+                "type": "scene",
+                "text": "后退",
+                "sceneId": "scene3"
+            },
+            {
+                "pitch": 0,
+                "yaw": 0,
+                "type": "scene",
+                "text": "进入",
+                "sceneId": "scene5"
+            },
+            {
+                "pitch": 0,
+                "yaw": -90,
+                "type": "scene",
+                "text": "雷锋塑像",
+                "sceneId": "scene6"
+            },
+        ]
+    };
+
+    var panorama5 = {
+        "title": "雷锋生平事迹陈列馆",
+        "type": "equirectangular",
+        "panorama": "https://pic.imgdb.cn/item/6611001568eb935713c7a02a.jpg",
+        "yaw": 0, // 定义初始视角的水平角度
+        "pitch": 0, // 定义初始视角的垂直角度
+        "hotSpots": [
+            {
+                "pitch": 0,
+                "yaw": 172,
+                "type": "scene",
+                "text": "后退",
+                "sceneId": "scene4"
+            },
+            {
+            "pitch": -7,
+            "yaw": 0,
+            "type": "info",
+            "text": "<img src=https://pic.imgdb.cn/item/6610fdfb68eb935713c3389b.jpg' width='500' height='250'>"
+            },
+        ]
+    };
+
+    var panorama6 = {
+        "title": "雷锋塑像",
+        "type": "equirectangular",
+        "panorama": "https://pic.imgdb.cn/item/6611002268eb935713c7bdda.jpg",
+        "yaw": 0, // 定义初始视角的水平角度
+        "pitch": 0, // 定义初始视角的垂直角度
+        "hotSpots": [
+            {
+                "pitch": 0,
+                "yaw": 180,
+                "type": "scene",
+                "text": "后退",
+                "sceneId": "scene4"
+            },
+            {
+                "pitch": 0,
+                "yaw": 30,
+                "type": "scene",
+                "text": "前进",
+                "sceneId": "scene7"
+            },
+            {
+                "pitch": 0,
+                "yaw": 0,
+                "type": "scene",
+                "text": "走近",
+                "sceneId": "scene64"
+            },
+
+        ]
+    };
+
+var panorama64 = {
+        "title": "前方",
+        "type": "equirectangular",
+        "panorama": "https://pic.imgdb.cn/item/661f6fc90ea9cb1403dfd332.jpg",
+        "yaw": 0, // 定义初始视角的水平角度
+        "pitch": 0, // 定义初始视角的垂直角度
+        "hotSpots": [
+            {
+                "pitch": 0,
+                "yaw": 180,
+                "type": "scene",
+                "text": "后退",
+                "sceneId": "scene6"
+            },
+            {
+                "pitch": 0,
+                "yaw": 30,
+                "type": "scene",
+                "text": "左侧",
+                "sceneId": "scene63"
+            },
+            {
+                "pitch": 0,
+                "yaw": -30,
+                "type": "scene",
+                "text": "右侧",
+                "sceneId": "scene62"
+            },
+        ]
+    };
+
+var panorama63 = {
+        "title": "左侧",
+        "type": "equirectangular",
+        "panorama": "https://pic.imgdb.cn/item/661f6f5e0ea9cb1403ddc0f1.jpg",
+        "yaw": 0, // 定义初始视角的水平角度
+        "pitch": 0, // 定义初始视角的垂直角度
+        "hotSpots": [
+            {
+                "pitch": 0,
+                "yaw": 30,
+                "type": "scene",
+                "text": "后方",
+                "sceneId": "scene61"
+            },
+            {
+                "pitch": 0,
+                "yaw": -30,
+                "type": "scene",
+                "text": "前方",
+                "sceneId": "scene64"
+            },
+        ]
+    };
+
+var panorama62 = {
+        "title": "右侧",
+        "type": "equirectangular",
+        "panorama": "https://pic.imgdb.cn/item/661f6e6a0ea9cb1403d8d80d.jpg",
+        "yaw": 0, // 定义初始视角的水平角度
+        "pitch": 0, // 定义初始视角的垂直角度
+        "hotSpots": [
+            {
+                "pitch": 0,
+                "yaw": -30,
+                "type": "scene",
+                "text": "后方",
+                "sceneId": "scene61"
+            },
+            {
+                "pitch": 0,
+                "yaw": 30,
+                "type": "scene",
+                "text": "前方",
+                "sceneId": "scene64"
+            },
+        ]
+    };
+
+var panorama61 = {
+        "title": "后方",
+        "type": "equirectangular",
+        "panorama": "https://pic.imgdb.cn/item/661f6dd40ea9cb1403d5f37f.jpg",
+        "yaw": 0, // 定义初始视角的水平角度
+        "pitch": 0, // 定义初始视角的垂直角度
+        "hotSpots": [
+            {
+                "pitch": 0,
+                "yaw": 180,
+                "type": "scene",
+                "text": "前进",
+                "sceneId": "scene7"
+            },
+            {
+                "pitch": 0,
+                "yaw": -30,
+                "type": "scene",
+                "text": "左侧",
+                "sceneId": "scene63"
+            },
+            {
+                "pitch": 0,
+                "yaw": 30,
+                "type": "scene",
+                "text": "右侧",
+                "sceneId": "scene62"
+            },
+        ]
+    };
+
+
+    var panorama7 = {
+        "title": "游步道三",
+        "type": "equirectangular",
+        "panorama": "https://pic.imgdb.cn/item/6611002368eb935713c7bedf.jpg",
+        "yaw": 0, // 定义初始视角的水平角度
+        "pitch": 0, // 定义初始视角的垂直角度
+        "hotSpots": [
+            {
+                "pitch": 0,
+                "yaw": 180,
+                "type": "scene",
+                "text": "雷锋塑像",
+                "sceneId": "scene6"
+            },
+            {
+                "pitch": 0,
+                "yaw": 90,
+                "type": "scene",
+                "text": "志愿者之家",
+                "sceneId": "scene8"
+            },
+            {
+                "pitch": 0,
+                "yaw": -90,
+                "type": "scene",
+                "text": "元帅广场",
+                "sceneId": "scene9"
+            },
+            {
+                "pitch": 0,
+                "yaw": 45,
+                "type": "scene",
+                "text": "雷锋故居",
+                "sceneId": "scene10"
+            },
+
+        ]
+    };
+
+    var panorama8 = {
+        "title": "志愿者之家",
+        "type": "equirectangular",
+        "panorama": "https://pic.imgdb.cn/item/6611002368eb935713c7c01f.jpg",
+        "yaw": 0, // 定义初始视角的水平角度
+        "pitch": 0, // 定义初始视角的垂直角度
+        "hotSpots": [
+            {
+                "pitch": 0,
+                "yaw": -90,
+                "type": "scene",
+                "text": "后退",
+                "sceneId": "scene7"
+            },
+        ]
+    };
+
+    var panorama9 = {
+        "title": "元帅广场",
+        "type": "equirectangular",
+        "panorama": "https://pic.imgdb.cn/item/6611002c68eb935713c7d4b5.jpg",
+        "yaw": -90, // 定义初始视角的水平角度
+        "pitch": 0, // 定义初始视角的垂直角度
+        "hotSpots": [
+            {
+                "pitch": 0,
+                "yaw": 90,
+                "type": "scene",
+                "text": "后退",
+                "sceneId": "scene7"
+            },
+            {
+            "pitch": -5,
+            "yaw": -50,
+            "type": "info",
+            "text": "<img src=https://pic.imgdb.cn/item/661f732b0ea9cb1403f09692.jpg' width='400' height='300'>"
+            },
+            {
+            "pitch": 0,
+            "yaw": -15,
+            "type": "info",
+            "text": "<img src=https://pic.imgdb.cn/item/661f732c0ea9cb1403f09817.jpg' width='400' height='300'>"
+            },
+            {
+            "pitch": 0,
+            "yaw": 14,
+            "type": "info",
+            "text": "<img src=https://pic.imgdb.cn/item/661f732c0ea9cb1403f0992c.jpg' width='400' height='300'>"
+            },
+            {
+            "pitch": -5,
+            "yaw": 50,
+            "type": "info",
+            "text": "<img src=https://pic.imgdb.cn/item/661f732c0ea9cb1403f09a85.jpg' width='400' height='300'>"
+            },
+        ]
+    };
+
+    var panorama10 = {
+        "title": "雷锋故居",
+        "type": "equirectangular",
+        "panorama": "https://pic.imgdb.cn/item/6611002d68eb935713c7d56d.jpg",
+        "yaw": 0, // 定义初始视角的水平角度
+        "pitch": 0, // 定义初始视角的垂直角度
+        "hotSpots": [
+            {
+                "pitch": 0,
+                "yaw": 172,
+                "type": "scene",
+                "text": "后退",
+                "sceneId": "scene7"
+            },
+            {
+                "pitch": 2,
+                "yaw": 3,
+                "type": "scene",
+                "text": "进入",
+                "sceneId": "scene11"
+            },
+     ]
+    };
+
+    var panorama11 = {
+        "title": "雷锋故居内部",
+        "type": "equirectangular",
+        "panorama": "https://pic.imgdb.cn/item/6611002d68eb935713c7d684.jpg",
+        "yaw": 0, // 定义初始视角的水平角度
+        "pitch": 0, // 定义初始视角的垂直角度
+        "hotSpots": [
+            {
+                "pitch": 0,
+                "yaw": 135,
+                "type": "scene",
+                "text": "后退",
+                "sceneId": "scene10"
+            },
+        ]
+    };
+
+
+    var viewer = pannellum.viewer('panorama', {
+        "scenes": {
+            "scene1": panorama1,
+            "scene2": panorama2,
+            "scene3": panorama3,
+            "scene4": panorama4,
+            "scene5": panorama5,
+            "scene6": panorama6,
+            "scene61": panorama61,
+            "scene62": panorama62,
+            "scene63": panorama63,
+            "scene64": panorama64,
+            "scene7": panorama7,
+            "scene8": panorama8,
+            "scene9": panorama9,
+            "scene10": panorama10,
+            "scene11": panorama11
+        },
+        "autoLoad": true
+    });
+
+    viewer.loadScene('scene1');
+
+        var audio = document.getElementById("backgroundMusic");
+        var playButton = document.getElementById("playButton");
+
+        // 当音频播放结束时，停止播放
+        audio.addEventListener("ended", function() {
+            playButton.textContent = "解说"; // 将按钮文本重置为播放
+        });
+
+        function toggleMusic() {
+            var audio = document.getElementById("backgroundMusic");
+            if (audio.paused) {
+                audio.play();
+                playButton.textContent = "暂停";
+            } else {
+                audio.pause();
+                playButton.textContent = "继续";
+            }
+        }
+
+    // 添加按钮点击事件
+    document.getElementById('backToScene1').addEventListener('click', function() {
+        viewer.loadScene('scene1');
+    });
+</script>
+
+</body>
+</html>
